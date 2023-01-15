@@ -1,17 +1,19 @@
 pipeline {
   agent any
   stages {
-    stage ('Install Git') {
+    stage ('Build') {
       steps {
-        sh 'yum install git -y'
-        sh 'git -version'
+        sh 'printenv'
+        sh 'docker build -t frankisinfotech/jenkinsdemo:""$GIT_COMMIT"" .'
       }
     }
-    stage ('Install node') {
+    
+     stage ('Publish to DockerHub') {
       steps {
-        sh 'yum install mysql -y'
-        sh 'mysql -v'
-      }
+        withDockerRegistry([credentialsId: "docker-hub", url: ""]) {
+          sh 'docker push frankisinfotech/jenkinsdemo:""$GIT_COMMIT""'
+         }
+       }
     }
   }
 }
